@@ -72,28 +72,36 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxYECiLwB7b52sBxrI_qnv6
 
 // Format biaya dengan Rp dan titik sebagai pemisah ribuan
 const biayaMap = { 
-    "SD": "Rp 300.000", 
-    "SMP": "Rp 400.000", 
-    "SMA": "Rp 500.000" 
+    "SD": "300000", 
+    "SMP": "400000", 
+    "SMA": "500000" 
 };
 
-// Fungsi untuk memformat angka ke format Rupiah
+// Fungsi untuk memformat angka ke format Rupiah (Rp 500.000)
 function formatRupiah(angka) {
-    // Jika sudah dalam format Rp, bersihkan dulu
-    let number = String(angka).replace(/[^0-9]/g, '');
-    if (!number) return "Rp 0";
+    if (!angka && angka !== 0) return "Rp 0";
     
-    // Format dengan titik sebagai pemisah ribuan
-    return "Rp " + Number(number).toLocaleString('id-ID');
+    // Konversi ke string dan bersihkan dari karakter non-digit
+    let number = String(angka).replace(/[^0-9]/g, '');
+    if (!number || number === "0") return "Rp 0";
+    
+    // Format dengan titik sebagai pemisah ribuan (contoh: 500000 -> 500.000)
+    let formatted = Number(number).toLocaleString('id-ID');
+    
+    return "Rp " + formatted;
 }
 
 // Fungsi untuk membersihkan format Rupiah ke angka
 function cleanRupiah(rupiah) {
+    if (!rupiah) return "0";
     return String(rupiah).replace(/[^0-9]/g, '');
 }
 
+// Saat jenjang berubah, set biaya otomatis
 document.getElementById("jenjang").onchange = function() {
-    document.getElementById("biaya").value = biayaMap[this.value] || "Rp 0";
+    const biayaValue = biayaMap[this.value] || "0";
+    // Tampilkan di input dengan format Rp
+    document.getElementById("biaya").value = formatRupiah(biayaValue);
 };
 
 async function simpan() {
