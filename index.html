@@ -28,7 +28,7 @@
         <div id="msg"></div>
         <input type="text" id="nama" placeholder="Nama Anak Asuh">
         <select id="jenjang">
-            <option value="">Pilih Jenjang Pendidikan</option>
+            <option value="">Pilih Jenjang</option>
             <option value="SD">SD</option>
             <option value="SMP">SMP</option>
             <option value="SMA">SMA</option>
@@ -54,7 +54,7 @@
             <thead>
                 <tr>
                     <th>Nama</th>
-                    <th>Jenjang Pendidikan</th>
+                    <th>Jenjang</th>
                     <th>Gender</th>
                     <th>Biaya</th>
                     <th>Aksi</th>
@@ -70,7 +70,12 @@
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbxYECiLwB7b52sBxrI_qnv6JoP2GZ6bDMEqf6IxXo8b5EVpwqkqQnInLyKXJS2Rue0j/exec";
 
-const biayaMap = { "SD": "Rp 300.000", "SMP": "Rp 400.000", "SMA": "Rp 500.000" };
+// Format biaya dengan Rp dan titik sebagai pemisah ribuan
+const biayaMap = { 
+    "SD": "Rp 300.000", 
+    "SMP": "Rp 400.000", 
+    "SMA": "Rp 500.000" 
+};
 
 // Fungsi untuk memformat angka ke format Rupiah
 function formatRupiah(angka) {
@@ -86,7 +91,7 @@ function formatRupiah(angka) {
 function cleanRupiah(rupiah) {
     return String(rupiah).replace(/[^0-9]/g, '');
 }
-    
+
 document.getElementById("jenjang").onchange = function() {
     document.getElementById("biaya").value = biayaMap[this.value] || "Rp 0";
 };
@@ -104,12 +109,21 @@ async function simpan() {
     
     document.getElementById("msg").innerHTML = "<div>Menyimpan...</div>";
     
+    // Simpan biaya dalam format angka (tanpa Rp dan titik)
+    const biayaAngka = cleanRupiah(biaya);
+    
     try {
-        const response = await fetch(API_URL, {
+        await fetch(API_URL, {
             method: "POST",
             mode: "no-cors",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "add", namaAsuh: nama, jenjang: jenjang, gender: gender, biaya: biaya })
+            body: JSON.stringify({ 
+                action: "add", 
+                namaAsuh: nama, 
+                jenjang: jenjang, 
+                gender: gender, 
+                biaya: biayaAngka  // Simpan sebagai angka
+            })
         });
         
         document.getElementById("msg").innerHTML = "<div class='success'>Berhasil disimpan!</div>";
@@ -132,7 +146,7 @@ async function hapusData(index) {
     msgDiv.innerHTML = "<div>Menghapus data...</div>";
     
     try {
-        const response = await fetch(API_URL, {
+        await fetch(API_URL, {
             method: "POST",
             mode: "no-cors",
             headers: { "Content-Type": "application/json" },
@@ -167,7 +181,8 @@ async function loadData() {
             const namaAsuh = String(row.namaAsuh || "");
             const jenjang = String(row.jenjang || "");
             const gender = String(row.gender || "");
-            const biaya = String(row.biaya || "");
+            // Format biaya ke format Rupiah
+            const biaya = formatRupiah(row.biaya || "0");
             
             tbody.innerHTML += `
                 <tr>
