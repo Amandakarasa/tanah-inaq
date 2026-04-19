@@ -72,6 +72,21 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxYECiLwB7b52sBxrI_qnv6
 
 const biayaMap = { "SD": "Rp 300.000", "SMP": "Rp 400.000", "SMA": "Rp 500.000" };
 
+// Fungsi untuk memformat angka ke format Rupiah
+function formatRupiah(angka) {
+    // Jika sudah dalam format Rp, bersihkan dulu
+    let number = String(angka).replace(/[^0-9]/g, '');
+    if (!number) return "Rp 0";
+    
+    // Format dengan titik sebagai pemisah ribuan
+    return "Rp " + Number(number).toLocaleString('id-ID');
+}
+
+// Fungsi untuk membersihkan format Rupiah ke angka
+function cleanRupiah(rupiah) {
+    return String(rupiah).replace(/[^0-9]/g, '');
+}
+    
 document.getElementById("jenjang").onchange = function() {
     document.getElementById("biaya").value = biayaMap[this.value] || "Rp 0";
 };
