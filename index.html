@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Yayasan</title>
+    <title>Data Yayasan - Sistem Login</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #667eea; padding: 20px; }
@@ -14,61 +14,195 @@
         button:hover { background: #5a67d8; }
         .btn-hapus { background: #e53e3e; padding: 6px 12px; font-size: 12px; }
         .btn-hapus:hover { background: #c53030; }
+        .btn-logout { background: #e53e3e; padding: 8px 16px; font-size: 14px; margin-left: 10px; }
+        .btn-logout:hover { background: #c53030; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background: #667eea; color: white; }
         .error { color: red; }
         .success { color: green; }
+        .login-container { 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #333;
+        }
+        .login-card input {
+            margin-bottom: 20px;
+        }
+        .login-card button {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header h2 {
+            margin: 0;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-info span {
+            color: #666;
+        }
+        .main-content {
+            display: none;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="card">
-        <h2>Tambah Data Anak Asuh</h2>
-        <div id="msg"></div>
-        <input type="text" id="nama" placeholder="Nama Anak Asuh">
-        <select id="jenjang">
-            <option value="">Pilih Jenjang</option>
-            <option value="SD">SD</option>
-            <option value="SMP">SMP</option>
-            <option value="SMA">SMA</option>
-        </select>
-        <select id="gender">
-            <option value="">Pilih Jenis Kelamin</option>
-            <option value="Laki-laki">Laki-laki</option>
-            <option value="Perempuan">Perempuan</option>
-        </select>
-        <input type="text" id="biaya" placeholder="Biaya" readonly>
-        <button onclick="simpan()">Simpan Data</button>
+<!-- Halaman Login -->
+<div id="loginPage" class="login-container">
+    <div class="login-card">
+        <h2>🔐 Login Sistem Data Yayasan</h2>
+        <div id="loginMsg"></div>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #999;">
+            Demo: admin / admin123
+        </p>
     </div>
-    
-    <div class="card">
-        <h2>Data Anak Asuh</h2>
-        <select id="filter" onchange="loadData()">
-            <option value="all">Semua</option>
-            <option value="SD">SD</option>
-            <option value="SMP">SMP</option>
-            <option value="SMA">SMA</option>
-        </select>
-        <table id="tabel">
-            <thead>
-                <tr>
-                    <th>Nama</th>
-                    <th>Jenjang</th>
-                    <th>Gender</th>
-                    <th>Biaya</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td colspan="5">Loading...</td></tr>
-            </tbody>
-        </table>
+</div>
+
+<!-- Halaman Utama (konten utama) -->
+<div id="mainPage" class="main-content">
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h2>📋 Data Anak Asuh Yayasan</h2>
+                <div class="user-info">
+                    <span>👤 <span id="loggedUser"></span></span>
+                    <button class="btn-logout" onclick="logout()">Logout</button>
+                </div>
+            </div>
+            <div id="msg"></div>
+            <input type="text" id="nama" placeholder="Nama Anak Asuh">
+            <select id="jenjang">
+                <option value="">Pilih Jenjang</option>
+                <option value="SD">SD</option>
+                <option value="SMP">SMP</option>
+                <option value="SMA">SMA</option>
+            </select>
+            <select id="gender">
+                <option value="">Pilih Jenis Kelamin</option>
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
+            </select>
+            <input type="text" id="biaya" placeholder="Biaya" readonly>
+            <button onclick="simpan()">➕ Simpan Data</button>
+        </div>
+        
+        <div class="card">
+            <h2>📊 Data Anak Asuh</h2>
+            <select id="filter" onchange="loadData()">
+                <option value="all">Semua</option>
+                <option value="SD">SD</option>
+                <option value="SMP">SMP</option>
+                <option value="SMA">SMA</option>
+            </select>
+            <table id="tabel">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Jenjang</th>
+                        <th>Gender</th>
+                        <th>Biaya</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="5">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxYECiLwB7b52sBxrI_qnv6JoP2GZ6bDMEqf6IxXo8b5EVpwqkqQnInLyKXJS2Rue0j/exec";
+// GANTI URL INI DENGAN APPS SCRIPT URL ANDA!
+const API_URL = "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_URL/exec";
+
+// Konfigurasi user (bisa ditambah lebih banyak)
+const USERS = {
+    "admin": "admin123",
+    "yayasan": "yayasan2024",
+    "pengurus": "pengurus123"
+};
+
+// Cek status login saat halaman dimuat
+window.onload = function() {
+    const isLoggedIn = sessionStorage.getItem("isLoggedIn");
+    const username = sessionStorage.getItem("username");
+    
+    if (isLoggedIn === "true" && username) {
+        showMainPage(username);
+    } else {
+        showLoginPage();
+    }
+};
+
+function login() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const loginMsg = document.getElementById("loginMsg");
+    
+    if (!username || !password) {
+        loginMsg.innerHTML = "<div class='error'>⚠️ Isi username dan password!</div>";
+        return;
+    }
+    
+    // Cek username dan password
+    if (USERS[username] && USERS[username] === password) {
+        // Login berhasil
+        sessionStorage.setItem("isLoggedIn", "true");
+        sessionStorage.setItem("username", username);
+        showMainPage(username);
+        loginMsg.innerHTML = "";
+    } else {
+        loginMsg.innerHTML = "<div class='error'>❌ Username atau password salah!</div>";
+    }
+}
+
+function logout() {
+    sessionStorage.clear();
+    showLoginPage();
+    // Reset form
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+}
+
+function showMainPage(username) {
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("mainPage").style.display = "block";
+    document.getElementById("loggedUser").innerText = username;
+    loadData(); // Load data setelah login
+}
+
+function showLoginPage() {
+    document.getElementById("loginPage").style.display = "flex";
+    document.getElementById("mainPage").style.display = "none";
+}
 
 // Format biaya dengan Rp dan titik sebagai pemisah ribuan
 const biayaMap = { 
@@ -77,48 +211,45 @@ const biayaMap = {
     "SMA": "500000" 
 };
 
-// Fungsi untuk memformat angka ke format Rupiah (Rp 500.000)
 function formatRupiah(angka) {
     if (!angka && angka !== 0) return "Rp 0";
-    
-    // Konversi ke string dan bersihkan dari karakter non-digit
     let number = String(angka).replace(/[^0-9]/g, '');
     if (!number || number === "0") return "Rp 0";
-    
-    // Format dengan titik sebagai pemisah ribuan (contoh: 500000 -> 500.000)
     let formatted = Number(number).toLocaleString('id-ID');
-    
     return "Rp " + formatted;
 }
 
-// Fungsi untuk membersihkan format Rupiah ke angka
 function cleanRupiah(rupiah) {
     if (!rupiah) return "0";
     return String(rupiah).replace(/[^0-9]/g, '');
 }
 
-// Saat jenjang berubah, set biaya otomatis
 document.getElementById("jenjang").onchange = function() {
     const biayaValue = biayaMap[this.value] || "0";
-    // Tampilkan di input dengan format Rp
     document.getElementById("biaya").value = formatRupiah(biayaValue);
 };
 
 async function simpan() {
-    const nama = document.getElementById("nama").value.trim();
-    const jenjang = document.getElementById("jenjang").value;
-    const gender = document.getElementById("gender").value;
-    const biaya = document.getElementById("biaya").value;
-    
-    if (!nama || !jenjang || !gender) {
-        document.getElementById("msg").innerHTML = "<div class='error'>Isi semua data!</div>";
+    // Cek login lagi untuk keamanan
+    if (sessionStorage.getItem("isLoggedIn") !== "true") {
+        alert("Sesi habis, silakan login kembali!");
+        logout();
         return;
     }
     
-    document.getElementById("msg").innerHTML = "<div>Menyimpan...</div>";
+    const nama = document.getElementById("nama").value.trim();
+    const jenjang = document.getElementById("jenjang").value;
+    const gender = document.getElementById("gender").value;
+    const biayaDisplay = document.getElementById("biaya").value;
     
-    // Simpan biaya dalam format angka (tanpa Rp dan titik)
-    const biayaAngka = cleanRupiah(biaya);
+    if (!nama || !jenjang || !gender) {
+        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Isi semua data!</div>";
+        return;
+    }
+    
+    const biayaAngka = cleanRupiah(biayaDisplay);
+    
+    document.getElementById("msg").innerHTML = "<div>💾 Menyimpan...</div>";
     
     try {
         await fetch(API_URL, {
@@ -130,28 +261,34 @@ async function simpan() {
                 namaAsuh: nama, 
                 jenjang: jenjang, 
                 gender: gender, 
-                biaya: biayaAngka  // Simpan sebagai angka
+                biaya: biayaAngka
             })
         });
         
-        document.getElementById("msg").innerHTML = "<div class='success'>Berhasil disimpan!</div>";
+        document.getElementById("msg").innerHTML = "<div class='success'>✅ Berhasil disimpan!</div>";
         document.getElementById("nama").value = "";
         document.getElementById("jenjang").value = "";
         document.getElementById("gender").value = "";
         document.getElementById("biaya").value = "Rp 0";
         setTimeout(loadData, 1000);
     } catch(e) {
-        document.getElementById("msg").innerHTML = "<div class='error'>Gagal: " + e.message + "</div>";
+        document.getElementById("msg").innerHTML = "<div class='error'>❌ Gagal: " + e.message + "</div>";
     }
 }
 
 async function hapusData(index) {
+    if (sessionStorage.getItem("isLoggedIn") !== "true") {
+        alert("Sesi habis, silakan login kembali!");
+        logout();
+        return;
+    }
+    
     if (!confirm("Apakah Anda yakin ingin menghapus data ini?")) {
         return;
     }
     
     const msgDiv = document.getElementById("msg");
-    msgDiv.innerHTML = "<div>Menghapus data...</div>";
+    msgDiv.innerHTML = "<div>🗑️ Menghapus data...</div>";
     
     try {
         await fetch(API_URL, {
@@ -161,17 +298,21 @@ async function hapusData(index) {
             body: JSON.stringify({ action: "delete", index: index })
         });
         
-        msgDiv.innerHTML = "<div class='success'>Data berhasil dihapus!</div>";
+        msgDiv.innerHTML = "<div class='success'>✅ Data berhasil dihapus!</div>";
         setTimeout(loadData, 1000);
     } catch(e) {
-        msgDiv.innerHTML = "<div class='error'>Gagal menghapus: " + e.message + "</div>";
+        msgDiv.innerHTML = "<div class='error'>❌ Gagal menghapus: " + e.message + "</div>";
     }
 }
 
 async function loadData() {
+    if (sessionStorage.getItem("isLoggedIn") !== "true") {
+        return;
+    }
+    
     const filter = document.getElementById("filter").value;
     const tbody = document.querySelector("#tabel tbody");
-    tbody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='5'>⏳ Loading...</td></tr>";
     
     try {
         const url = `${API_URL}?action=get&filter=${filter}`;
@@ -179,31 +320,32 @@ async function loadData() {
         const data = await response.json();
         
         if (!data || data.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='5'>Belum ada data</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='5'>📭 Belum ada data</td></tr>";
             return;
         }
         
         tbody.innerHTML = "";
         for (let i = 0; i < data.length; i++) {
             const row = data[i];
-            const namaAsuh = String(row.namaAsuh || "");
-            const jenjang = String(row.jenjang || "");
-            const gender = String(row.gender || "");
-            // Format biaya ke format Rupiah
-            const biaya = formatRupiah(row.biaya || "0");
+            const namaAsuh = String(row.namaAsuh || row.Nama || "");
+            const jenjang = String(row.jenjang || row.Jenjang || "");
+            const gender = String(row.gender || row.Gender || "");
+            let biayaValue = row.biaya || row.Biaya || "0";
+            const biayaFormatted = formatRupiah(biayaValue);
             
             tbody.innerHTML += `
                 <tr>
                     <td>${escapeHtml(namaAsuh)}</td>
                     <td>${escapeHtml(jenjang)}</td>
                     <td>${escapeHtml(gender)}</td>
-                    <td>${escapeHtml(biaya)}</td>
-                    <td><button class="btn-hapus" onclick="hapusData(${i})">Hapus</button></td>
+                    <td>${escapeHtml(biayaFormatted)}</td>
+                    <td><button class="btn-hapus" onclick="hapusData(${i})">🗑️ Hapus</button></td>
                 </tr>
             `;
         }
     } catch(e) {
-        tbody.innerHTML = `<tr><td colspan='5'>Error: ${e.message}</td></tr>`;
+        console.error("Error:", e);
+        tbody.innerHTML = `<tr><td colspan='5'>❌ Error: ${e.message}</td></tr>`;
     }
 }
 
@@ -217,8 +359,6 @@ function escapeHtml(str) {
         return m;
     });
 }
-
-loadData();
 </script>
 </body>
 </html>
