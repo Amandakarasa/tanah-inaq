@@ -11,6 +11,9 @@
         .card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
         input, select { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #ddd; border-radius: 8px; }
         button { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }
+        button:hover { background: #5a67d8; }
+        .btn-hapus { background: #e53e3e; padding: 6px 12px; font-size: 12px; }
+        .btn-hapus:hover { background: #c53030; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background: #667eea; color: white; }
@@ -48,8 +51,18 @@
             <option value="SMA">SMA</option>
         </select>
         <table id="tabel">
-            <thead><tr><th>Nama</th><th>Jenjang</th><th>Gender</th><th>Biaya</th></tr></thead>
-            <tbody><tr><td colspan="4">Loading...</td></tr>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Jenjang</th>
+                    <th>Gender</th>
+                    <th>Biaya</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="5">Loading...</td></tr>
+            </tbody>
         </table>
     </div>
 </div>
@@ -95,10 +108,33 @@ async function simpan() {
     }
 }
 
+async function hapusData(index) {
+    if (!confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+        return;
+    }
+    
+    const msgDiv = document.getElementById("msg");
+    msgDiv.innerHTML = "<div>Menghapus data...</div>";
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "delete", index: index })
+        });
+        
+        msgDiv.innerHTML = "<div class='success'>Data berhasil dihapus!</div>";
+        setTimeout(loadData, 1000);
+    } catch(e) {
+        msgDiv.innerHTML = "<div class='error'>Gagal menghapus: " + e.message + "</div>";
+    }
+}
+
 async function loadData() {
     const filter = document.getElementById("filter").value;
     const tbody = document.querySelector("#tabel tbody");
-    tbody.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
     
     try {
         const url = `${API_URL}?action=get&filter=${filter}`;
@@ -106,31 +142,33 @@ async function loadData() {
         const data = await response.json();
         
         if (!data || data.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='4'>Belum ada data</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='5'>Belum ada data</td></tr>";
             return;
         }
         
         tbody.innerHTML = "";
-        for (let row of data) {
-            // Perbaikan: konversi semua nilai ke string dengan aman
+        for (let i = 0; i < data.length; i++) {
+            const row = data[i];
             const namaAsuh = String(row.namaAsuh || "");
             const jenjang = String(row.jenjang || "");
             const gender = String(row.gender || "");
             const biaya = String(row.biaya || "");
             
-            tbody.innerHTML += `<tr>
-                <td>${escapeHtml(namaAsuh)}</td>
-                <td>${escapeHtml(jenjang)}</td>
-                <td>${escapeHtml(gender)}</td>
-                <td>${escapeHtml(biaya)}</td>
-            </tr>`;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${escapeHtml(namaAsuh)}</td>
+                    <td>${escapeHtml(jenjang)}</td>
+                    <td>${escapeHtml(gender)}</td>
+                    <td>${escapeHtml(biaya)}</td>
+                    <td><button class="btn-hapus" onclick="hapusData(${i})">Hapus</button></td>
+                </tr>
+            `;
         }
     } catch(e) {
-        tbody.innerHTML = `<tr><td colspan='4'>Error: ${e.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan='5'>Error: ${e.message}</td></tr>`;
     }
 }
 
-// Perbaikan fungsi escapeHtml untuk handle non-string
 function escapeHtml(str) {
     if (str === undefined || str === null) return "";
     const s = String(str);
