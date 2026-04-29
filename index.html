@@ -295,6 +295,21 @@ let USERS = JSON.parse(localStorage.getItem("yayasan_users")) || {
     "pengurus": "pengurus123"
 };
 
+// Map biaya berdasarkan jenjang
+const biayaMap = { 
+    "SD": "400000",
+    "SD/MI": "400000",
+    "SMP": "500000",
+    "SMP/MTs": "500000",
+    "SMPLB": "500000",
+    "MTs": "500000",
+    "SMA": "600000", 
+    "SMK": "600000",
+    "MA": "500000",
+    "Universitas": "600000",
+    "akan masuk Universitas": "600000"
+};
+
 // Simpan user ke localStorage
 function saveUsers() {
     localStorage.setItem("yayasan_users", JSON.stringify(USERS));
