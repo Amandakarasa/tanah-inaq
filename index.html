@@ -10,7 +10,6 @@
         .container { max-width: 1400px; margin: 0 auto; }
         .card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
         input, select, textarea { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #ddd; border-radius: 8px; }
-        textarea { resize: vertical; font-family: Arial; }
         button { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }
         button:hover { background: #5a67d8; }
         .btn-hapus { background: #e53e3e; padding: 6px 12px; font-size: 12px; }
@@ -68,9 +67,6 @@
             gap: 10px;
             flex-wrap: wrap;
         }
-        .user-info span {
-            color: #666;
-        }
         .main-content {
             display: none;
         }
@@ -93,34 +89,6 @@
             width: 90%;
             max-width: 500px;
         }
-        .modal-content h3 {
-            margin-bottom: 20px;
-        }
-        .modal-content input {
-            margin-bottom: 15px;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-        .user-list {
-            margin: 20px 0;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .user-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        .user-item button {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -130,7 +98,6 @@
             .form-row {
                 grid-template-columns: 1fr;
             }
-            .container { padding: 0; }
         }
         .status-badge {
             display: inline-block;
@@ -143,7 +110,7 @@
         .status-yatim { background: #dbeafe; color: #1e40af; }
         .status-piatu { background: #e0e7ff; color: #3730a3; }
         .status-disabilitas { background: #fce7f3; color: #9d174d; }
-        .status-lainnya { background: #e5e7eb; color: #374151; }
+        .required::after { content: " *"; color: red; }
     </style>
 </head>
 <body>
@@ -174,12 +141,12 @@
             
             <div class="form-row">
                 <div>
-                    <label>👤 Nama Anak Asuh *</label>
+                    <label>👤 Nama Anak Asuh</label>
                     <input type="text" id="nama" placeholder="Nama lengkap anak asuh">
                 </div>
                 <div>
                     <label>🆔 No. Anak Asuh</label>
-                    <input type="text" id="noAnak" placeholder="Nomor urut anak asuh">
+                    <input type="text" id="noAnak" placeholder="Nomor anak asuh">
                 </div>
             </div>
 
@@ -196,7 +163,7 @@
 
             <div class="form-row">
                 <div>
-                    <label>📚 Jenjang Pendidikan *</label>
+                    <label class="required">📚 Jenjang Pendidikan</label>
                     <select id="jenjang">
                         <option value="">Pilih Jenjang</option>
                         <option value="SD">SD</option>
@@ -209,18 +176,10 @@
                         <option value="SMK">SMK</option>
                         <option value="MA">MA</option>
                         <option value="Universitas">Universitas</option>
-                        <option value="akan masuk Universitas">akan masuk Universitas</option>
                     </select>
                 </div>
                 <div>
-                    <label>💰 Nominal Sponsor *</label>
-                    <input type="text" id="biaya" placeholder="Biaya sponsor" readonly>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div>
-                    <label>📌 Status Anak *</label>
+                    <label class="required">📌 Status Anak</label>
                     <select id="status">
                         <option value="">Pilih Status</option>
                         <option value="Yatim Piatu">Yatim Piatu</option>
@@ -229,10 +188,14 @@
                         <option value="Disabilitas">Disabilitas</option>
                         <option value="Anak terlantar">Anak terlantar</option>
                         <option value="Anak dari keluarga tidak mampu">Anak dari keluarga tidak mampu</option>
-                        <option value="Anak yang memiliki potensi">Anak yang memiliki potensi</option>
-                        <option value="Yatim Piatu dan Disabilitas">Yatim Piatu dan Disabilitas</option>
                     </select>
                 </div>
+            </div>
+
+            <div>
+                <label class="required">💰 Nominal Sponsor</label>
+                <input type="text" id="biaya" placeholder="Biaya sponsor" readonly>
+            </div>
 
             <button onclick="simpan()">➕ Simpan Data</button>
         </div>
@@ -261,20 +224,20 @@
                 <table id="tabel">
                     <thead>
                         <tr>
-                            <th>No.</th>
+                            <th>NO</th>
                             <th>Nama Orang Tua Asuh</th>
-                            <th>Nama Pendamping</th>
-                            <th>No. Anak</th>
+                            <th>Nama Pendamping Lokal</th>
+                            <th>No Anak Asuh</th>
                             <th>Nama Anak Asuh</th>
                             <th>Status</th>
-                            <th>Jenjang</th>
+                            <th>Jenjang Pendidikan</th>
                             <th>Nominal Sponsor</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody><tr><td colspan="9">⏳ Loading...</td></tr>
                 </tbody>
-                </table>
+            </table>
             </div>
         </div>
     </div>
@@ -285,14 +248,11 @@
     <div class="modal-content">
         <h3>👑 Kelola User</h3>
         <div id="userMsg"></div>
-        
         <div class="user-list" id="userList"></div>
-        
         <h4>Tambah User Baru</h4>
         <input type="text" id="newUsername" placeholder="Username baru">
         <input type="password" id="newPassword" placeholder="Password">
         <button onclick="addUser()">➕ Tambah User</button>
-        
         <div class="modal-buttons">
             <button onclick="closeUserModal()">Tutup</button>
         </div>
@@ -300,56 +260,38 @@
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxYECiLwB7b52sBxrI_qnv6JoP2GZ6bDMEqf6IxXo8b5EVpwqkqQnInLyKXJS2Rue0j/exec";
+// GANTI DENGAN URL APPS SCRIPT ANDA!
+const API_URL = "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_URL/exec";
 
-// Load user dari localStorage atau default
 let USERS = JSON.parse(localStorage.getItem("yayasan_users")) || {
     "admin": "admin123",
     "yayasan": "yayasan2024",
     "pengurus": "pengurus123"
 };
 
-// Map biaya berdasarkan jenjang
 const biayaMap = { 
-    "SD": "400000",
-    "SD/MI": "400000",
-    "SMP": "500000",
-    "SMP/MTs": "500000",
-    "SMPLB": "500000",
-    "MTs": "500000",
-    "SMA": "600000", 
-    "SMK": "600000",
-    "MA": "500000",
-    "Universitas": "600000",
-    "akan masuk Universitas": "600000"
+    "SD": "400000", "SD/MI": "400000", "SMP": "500000", "SMP/MTs": "500000",
+    "SMPLB": "500000", "MTs": "500000", "SMA": "600000", "SMK": "600000",
+    "MA": "500000", "Universitas": "600000"
 };
 
-// Simpan user ke localStorage
-function saveUsers() {
-    localStorage.setItem("yayasan_users", JSON.stringify(USERS));
-}
+function saveUsers() { localStorage.setItem("yayasan_users", JSON.stringify(USERS)); }
 
 window.onload = function() {
     const isLoggedIn = sessionStorage.getItem("isLoggedIn");
     const username = sessionStorage.getItem("username");
-    
-    if (isLoggedIn === "true" && username) {
-        showMainPage(username);
-    } else {
-        showLoginPage();
-    }
+    if (isLoggedIn === "true" && username) showMainPage(username);
+    else showLoginPage();
 };
 
 function login() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
     const loginMsg = document.getElementById("loginMsg");
-    
     if (!username || !password) {
         loginMsg.innerHTML = "<div class='error'>⚠️ Isi username dan password!</div>";
         return;
     }
-    
     if (USERS[username] && USERS[username] === password) {
         sessionStorage.setItem("isLoggedIn", "true");
         sessionStorage.setItem("username", username);
@@ -363,21 +305,13 @@ function login() {
 function logout() {
     sessionStorage.clear();
     showLoginPage();
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
 }
 
 function showMainPage(username) {
     document.getElementById("loginPage").style.display = "none";
     document.getElementById("mainPage").style.display = "block";
     document.getElementById("loggedUser").innerText = username;
-    
-    if (username === "admin") {
-        document.getElementById("adminBtn").style.display = "inline-block";
-    } else {
-        document.getElementById("adminBtn").style.display = "none";
-    }
-    
+    if (username === "admin") document.getElementById("adminBtn").style.display = "inline-block";
     loadData();
 }
 
@@ -393,15 +327,11 @@ function showUserManager() {
 
 function closeUserModal() {
     document.getElementById("userModal").style.display = "none";
-    document.getElementById("userMsg").innerHTML = "";
-    document.getElementById("newUsername").value = "";
-    document.getElementById("newPassword").value = "";
 }
 
 function refreshUserList() {
     const userListDiv = document.getElementById("userList");
     userListDiv.innerHTML = "<h4>Daftar User:</h4>";
-    
     for (let [username, password] of Object.entries(USERS)) {
         userListDiv.innerHTML += `
             <div class="user-item">
@@ -421,10 +351,6 @@ function editUser(username) {
         USERS[username] = newPassword.trim();
         saveUsers();
         refreshUserList();
-        document.getElementById("userMsg").innerHTML = "<div class='success'>✅ Password berhasil diubah!</div>";
-        setTimeout(() => {
-            document.getElementById("userMsg").innerHTML = "";
-        }, 2000);
     }
 }
 
@@ -433,36 +359,26 @@ function deleteUser(username) {
         delete USERS[username];
         saveUsers();
         refreshUserList();
-        document.getElementById("userMsg").innerHTML = "<div class='success'>✅ User berhasil dihapus!</div>";
-        setTimeout(() => {
-            document.getElementById("userMsg").innerHTML = "";
-        }, 2000);
     }
 }
 
 function addUser() {
     const newUsername = document.getElementById("newUsername").value.trim();
     const newPassword = document.getElementById("newPassword").value.trim();
-    
     if (!newUsername || !newPassword) {
-        document.getElementById("userMsg").innerHTML = "<div class='error'>⚠️ Isi username dan password!</div>";
+        document.getElementById("userMsg").innerHTML = "<div class='error'>⚠️ Isi semua field!</div>";
         return;
     }
-    
     if (USERS[newUsername]) {
         document.getElementById("userMsg").innerHTML = "<div class='error'>⚠️ Username sudah ada!</div>";
         return;
     }
-    
     USERS[newUsername] = newPassword;
     saveUsers();
     refreshUserList();
     document.getElementById("newUsername").value = "";
     document.getElementById("newPassword").value = "";
     document.getElementById("userMsg").innerHTML = "<div class='success'>✅ User berhasil ditambahkan!</div>";
-    setTimeout(() => {
-        document.getElementById("userMsg").innerHTML = "";
-    }, 2000);
 }
 
 function formatRupiah(angka) {
@@ -495,11 +411,10 @@ async function simpan() {
     const nama = document.getElementById("nama").value.trim();
     const status = document.getElementById("status").value;
     const jenjang = document.getElementById("jenjang").value;
-    const gender = document.getElementById("gender").value;
     const biayaDisplay = document.getElementById("biaya").value;
     
-    if (!nama || !jenjang || !gender || !status) {
-        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Isi semua data wajib! (Nama, Jenjang, Gender, Status)</div>";
+    if (!nama || !jenjang || !status) {
+        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Isi Nama, Jenjang, dan Status!</div>";
         return;
     }
     
@@ -507,9 +422,8 @@ async function simpan() {
     document.getElementById("msg").innerHTML = "<div>💾 Menyimpan...</div>";
     
     try {
-        await fetch(API_URL, {
+        const response = await fetch(API_URL, {
             method: "POST",
-            mode: "no-cors",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
                 action: "add", 
@@ -519,62 +433,63 @@ async function simpan() {
                 namaAsuh: nama, 
                 status: status,
                 jenjang: jenjang, 
-                gender: gender, 
                 biaya: biayaAngka 
             })
         });
         
-        document.getElementById("msg").innerHTML = "<div class='success'>✅ Berhasil disimpan!</div>";
-        document.getElementById("noAnak").value = "";
-        document.getElementById("ortuAsuh").value = "";
-        document.getElementById("pendamping").value = "";
-        document.getElementById("nama").value = "";
-        document.getElementById("status").value = "";
-        document.getElementById("jenjang").value = "";
-        document.getElementById("gender").value = "";
-        document.getElementById("biaya").value = "Rp 0";
-        setTimeout(loadData, 1000);
+        const result = await response.json();
+        
+        if (result.status === "success") {
+            document.getElementById("msg").innerHTML = "<div class='success'>✅ " + result.message + "</div>";
+            document.getElementById("noAnak").value = "";
+            document.getElementById("ortuAsuh").value = "";
+            document.getElementById("pendamping").value = "";
+            document.getElementById("nama").value = "";
+            document.getElementById("status").value = "";
+            document.getElementById("jenjang").value = "";
+            document.getElementById("biaya").value = "Rp 0";
+            setTimeout(loadData, 1000);
+        } else {
+            document.getElementById("msg").innerHTML = "<div class='error'>❌ Gagal: " + result.message + "</div>";
+        }
     } catch(e) {
-        document.getElementById("msg").innerHTML = "<div class='error'>❌ Gagal: " + e.message + "</div>";
+        document.getElementById("msg").innerHTML = "<div class='error'>❌ Gagal menyimpan: " + e.message + "</div>";
     }
 }
 
 async function hapusData(index) {
-    if (sessionStorage.getItem("isLoggedIn") !== "true") {
-        alert("Sesi habis, silakan login kembali!");
-        logout();
-        return;
-    }
-    
     if (!confirm("Apakah Anda yakin ingin menghapus data ini?")) return;
     
     const msgDiv = document.getElementById("msg");
-    msgDiv.innerHTML = "<div>🗑️ Menghapus data...</div>";
+    msgDiv.innerHTML = "<div>🗑️ Menghapus...</div>";
     
     try {
-        await fetch(API_URL, {
+        const response = await fetch(API_URL, {
             method: "POST",
-            mode: "no-cors",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "delete", index: index })
         });
+        const result = await response.json();
         
-        msgDiv.innerHTML = "<div class='success'>✅ Data berhasil dihapus!</div>";
-        setTimeout(loadData, 1000);
+        if (result.status === "success") {
+            msgDiv.innerHTML = "<div class='success'>✅ Data berhasil dihapus!</div>";
+            setTimeout(loadData, 1000);
+        } else {
+            msgDiv.innerHTML = "<div class='error'>❌ " + result.message + "</div>";
+        }
     } catch(e) {
-        msgDiv.innerHTML = "<div class='error'>❌ Gagal menghapus: " + e.message + "</div>";
+        msgDiv.innerHTML = "<div class='error'>❌ Gagal: " + e.message + "</div>";
     }
 }
 
 function getStatusClass(status) {
-    const statusMap = {
+    const map = {
         'Yatim Piatu': 'status-yatim-piatu',
         'Yatim': 'status-yatim',
         'Piatu': 'status-piatu',
-        'Disabilitas': 'status-disabilitas',
-        'Yatim Piatu dan Disabilitas': 'status-disabilitas'
+        'Disabilitas': 'status-disabilitas'
     };
-    return statusMap[status] || 'status-lainnya';
+    return map[status] || 'status-lainnya';
 }
 
 async function loadData() {
@@ -599,29 +514,27 @@ async function loadData() {
         for (let i = 0; i < data.length; i++) {
             const row = data[i];
             const statusClass = getStatusClass(String(row.status || ""));
-            
             tbody.innerHTML += `
                 <tr>
-                    <td>${escapeHtml(String(row.noAnak || i+1 || ""))}</td>
+                    <td>${escapeHtml(String(row.no || i+1))}</td>
                     <td>${escapeHtml(String(row.ortuAsuh || ""))}</td>
                     <td>${escapeHtml(String(row.pendamping || ""))}</td>
                     <td>${escapeHtml(String(row.noAnak || ""))}</td>
-                    <td><strong>${escapeHtml(String(row.namaAsuh || row.Nama || ""))}</strong></td>
+                    <td><strong>${escapeHtml(String(row.namaAsuh || ""))}</strong></td>
                     <td><span class="status-badge ${statusClass}">${escapeHtml(String(row.status || ""))}</span></td>
-                    <td>${escapeHtml(String(row.jenjang || row.Jenjang || ""))}</td>
-                    <td>${formatRupiah(row.biaya || row.Biaya || "0")}</td>
+                    <td>${escapeHtml(String(row.jenjang || ""))}</td>
+                    <td>${formatRupiah(row.biaya || "0")}</td>
                     <td><button class="btn-hapus" onclick="hapusData(${i})">🗑️ Hapus</button></td>
                 </tr>
             `;
         }
     } catch(e) {
-        console.error("Error:", e);
         tbody.innerHTML = `<tr><td colspan='9'>❌ Error: ${e.message}</td></tr>`;
     }
 }
 
 function escapeHtml(str) {
-    if (str === undefined || str === null) return "";
+    if (!str) return "";
     return String(str).replace(/[&<>]/g, function(m) {
         if (m === "&") return "&amp;";
         if (m === "<") return "&lt;";
