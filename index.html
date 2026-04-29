@@ -144,6 +144,10 @@
         .status-piatu { background: #e0e7ff; color: #3730a3; }
         .status-disabilitas { background: #fce7f3; color: #9d174d; }
         .status-lainnya { background: #e5e7eb; color: #374151; }
+        .required::after {
+            content: " *";
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -174,7 +178,7 @@
             
             <div class="form-row">
                 <div>
-                    <label>👤 Nama Anak Asuh </label>
+                    <label class="required">👤 Nama Anak Asuh</label>
                     <input type="text" id="nama" placeholder="Nama lengkap anak asuh">
                 </div>
                 <div>
@@ -196,7 +200,7 @@
 
             <div class="form-row">
                 <div>
-                    <label>📚 Jenjang Pendidikan *</label>
+                    <label class="required">📚 Jenjang Pendidikan</label>
                     <select id="jenjang">
                         <option value="">Pilih Jenjang</option>
                         <option value="SD">SD</option>
@@ -212,15 +216,10 @@
                         <option value="akan masuk Universitas">akan masuk Universitas</option>
                     </select>
                 </div>
-                <div>
-                    <label>💰 Nominal Sponsor *</label>
-                    <input type="text" id="biaya" placeholder="Biaya sponsor" readonly>
-                </div>
-            </div>
 
             <div class="form-row">
                 <div>
-                    <label>📌 Status Anak *</label>
+                    <label class="required">📌 Status Anak</label>
                     <select id="status">
                         <option value="">Pilih Status</option>
                         <option value="Yatim Piatu">Yatim Piatu</option>
@@ -233,6 +232,11 @@
                         <option value="Yatim Piatu dan Disabilitas">Yatim Piatu dan Disabilitas</option>
                     </select>
                 </div>
+                <div>
+                    <label class="required">💰 Nominal Sponsor</label>
+                    <input type="text" id="biaya" placeholder="Biaya sponsor" readonly>
+                </div>
+            </div>
 
             <button onclick="simpan()">➕ Simpan Data</button>
         </div>
@@ -268,13 +272,14 @@
                             <th>Nama Anak Asuh</th>
                             <th>Status</th>
                             <th>Jenjang</th>
+                            <th>Jenis Kelamin</th>
                             <th>Nominal Sponsor</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody><tr><td colspan="9">⏳ Loading...</td></tr>
+                    <tbody><tr><td colspan="10">⏳ Loading...</td></tr>
                 </tbody>
-                </table>
+            </table>
             </div>
         </div>
     </div>
@@ -300,6 +305,7 @@
 </div>
 
 <script>
+// GANTI URL INI DENGAN APPS SCRIPT URL ANDA YANG SUDAH DIUPDATE!
 const API_URL = "https://script.google.com/macros/s/AKfycbxYECiLwB7b52sBxrI_qnv6JoP2GZ6bDMEqf6IxXo8b5EVpwqkqQnInLyKXJS2Rue0j/exec";
 
 // Load user dari localStorage atau default
@@ -498,19 +504,34 @@ async function simpan() {
     const gender = document.getElementById("gender").value;
     const biayaDisplay = document.getElementById("biaya").value;
     
-    if (!nama || !jenjang || !gender || !status) {
-        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Isi semua data wajib! (Nama, Jenjang, Gender, Status)</div>";
+    // Validasi
+    if (!nama) {
+        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Nama Anak Asuh wajib diisi!</div>";
+        return;
+    }
+    if (!jenjang) {
+        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Jenjang Pendidikan wajib dipilih!</div>";
+        return;
+    }
+    if (!gender) {
+        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Jenis Kelamin wajib dipilih!</div>";
+        return;
+    }
+    if (!status) {
+        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Status Anak wajib dipilih!</div>";
         return;
     }
     
     const biayaAngka = cleanRupiah(biayaDisplay);
-    document.getElementById("msg").innerHTML = "<div>💾 Menyimpan...</div>";
+    document.getElementById("msg").innerHTML = "<div>💾 Menyimpan data ke Google Sheet...</div>";
     
     try {
-        await fetch(API_URL, {
+        // HAPUS mode: "no-cors" untuk bisa membaca response!
+        const response = await fetch(API_URL, {
             method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({ 
                 action: "add", 
                 noAnak: noAnak,
@@ -524,18 +545,28 @@ async function simpan() {
             })
         });
         
-        document.getElementById("msg").innerHTML = "<div class='success'>✅ Berhasil disimpan!</div>";
-        document.getElementById("noAnak").value = "";
-        document.getElementById("ortuAsuh").value = "";
-        document.getElementById("pendamping").value = "";
-        document.getElementById("nama").value = "";
-        document.getElementById("status").value = "";
-        document.getElementById("jenjang").value = "";
-        document.getElementById("gender").value = "";
-        document.getElementById("biaya").value = "Rp 0";
-        setTimeout(loadData, 1000);
+        const result = await response.json();
+        console.log("Response dari server:", result);
+        
+        if (result.status === "success") {
+            document.getElementById("msg").innerHTML = "<div class='success'>✅ " + (result.message || "Data berhasil disimpan!") + "</div>";
+            // Reset form
+            document.getElementById("noAnak").value = "";
+            document.getElementById("ortuAsuh").value = "";
+            document.getElementById("pendamping").value = "";
+            document.getElementById("nama").value = "";
+            document.getElementById("status").value = "";
+            document.getElementById("jenjang").value = "";
+            document.getElementById("gender").value = "";
+            document.getElementById("biaya").value = "Rp 0";
+            // Reload tabel
+            setTimeout(loadData, 1000);
+        } else {
+            document.getElementById("msg").innerHTML = "<div class='error'>❌ Gagal: " + (result.message || "Unknown error") + "</div>";
+        }
     } catch(e) {
-        document.getElementById("msg").innerHTML = "<div class='error'>❌ Gagal: " + e.message + "</div>";
+        console.error("Error detail:", e);
+        document.getElementById("msg").innerHTML = "<div class='error'>❌ Gagal menyimpan: " + e.message + ". Cek koneksi internet dan pastikan Apps Script sudah di-deploy ulang.</div>";
     }
 }
 
@@ -552,16 +583,22 @@ async function hapusData(index) {
     msgDiv.innerHTML = "<div>🗑️ Menghapus data...</div>";
     
     try {
-        await fetch(API_URL, {
+        const response = await fetch(API_URL, {
             method: "POST",
-            mode: "no-cors",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "delete", index: index })
         });
         
-        msgDiv.innerHTML = "<div class='success'>✅ Data berhasil dihapus!</div>";
-        setTimeout(loadData, 1000);
+        const result = await response.json();
+        
+        if (result.status === "success") {
+            msgDiv.innerHTML = "<div class='success'>✅ Data berhasil dihapus!</div>";
+            setTimeout(loadData, 1000);
+        } else {
+            msgDiv.innerHTML = "<div class='error'>❌ Gagal menghapus: " + (result.message || "Unknown error") + "</div>";
+        }
     } catch(e) {
+        console.error("Error:", e);
         msgDiv.innerHTML = "<div class='error'>❌ Gagal menghapus: " + e.message + "</div>";
     }
 }
@@ -583,15 +620,19 @@ async function loadData() {
     const filterJenjang = document.getElementById("filter").value;
     const filterStatus = document.getElementById("filterStatus").value;
     const tbody = document.querySelector("#tabel tbody");
-    tbody.innerHTML = "<tr><td colspan='9'>⏳ Loading...</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='10'>⏳ Loading...</td></tr>";
     
     try {
         const url = `${API_URL}?action=get&filter=${filterJenjang}&filterStatus=${filterStatus}`;
+        console.log("Fetching data dari:", url);
+        
         const response = await fetch(url);
         const data = await response.json();
         
+        console.log("Data diterima:", data);
+        
         if (!data || data.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='9'>📭 Belum ada data</td></tr>";
+            tbody.innerHTML = "<table><td colspan='10'>📭 Belum ada data</td></tr>";
             return;
         }
         
@@ -602,21 +643,22 @@ async function loadData() {
             
             tbody.innerHTML += `
                 <tr>
-                    <td>${escapeHtml(String(row.noAnak || i+1 || ""))}</td>
+                    <td>${escapeHtml(String(i+1))}</td>
                     <td>${escapeHtml(String(row.ortuAsuh || ""))}</td>
                     <td>${escapeHtml(String(row.pendamping || ""))}</td>
                     <td>${escapeHtml(String(row.noAnak || ""))}</td>
-                    <td><strong>${escapeHtml(String(row.namaAsuh || row.Nama || ""))}</strong></td>
+                    <td><strong>${escapeHtml(String(row.namaAsuh || ""))}</strong></td>
                     <td><span class="status-badge ${statusClass}">${escapeHtml(String(row.status || ""))}</span></td>
-                    <td>${escapeHtml(String(row.jenjang || row.Jenjang || ""))}</td>
-                    <td>${formatRupiah(row.biaya || row.Biaya || "0")}</td>
+                    <td>${escapeHtml(String(row.jenjang || ""))}</td>
+                    <td>${escapeHtml(String(row.gender || ""))}</td>
+                    <td>${formatRupiah(row.biaya || "0")}</td>
                     <td><button class="btn-hapus" onclick="hapusData(${i})">🗑️ Hapus</button></td>
                 </tr>
             `;
         }
     } catch(e) {
-        console.error("Error:", e);
-        tbody.innerHTML = `<tr><td colspan='9'>❌ Error: ${e.message}</td></tr>`;
+        console.error("Error loading data:", e);
+        tbody.innerHTML = `<tr><td colspan='10'>❌ Error: ${e.message}. Cek console untuk detail.</td></tr>`;
     }
 }
 
