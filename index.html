@@ -1,16 +1,16 @@
-<!DOCTYPE html>
+ok bantu aku menyesuaikan kembali isi codingan ini agar sesuai dengan isi dari tabel dari data ini ya: <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Anak Asuh Yayasan</title>
+    <title>Data Yayasan - Sistem Login</title>
     <style>
+        /* style sama seperti sebelumnya */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #667eea; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
         .card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #ddd; border-radius: 8px; }
-        textarea { resize: vertical; font-family: Arial; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #ddd; border-radius: 8px; }
         button { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }
         button:hover { background: #5a67d8; }
         .btn-hapus { background: #e53e3e; padding: 6px 12px; font-size: 12px; }
@@ -19,9 +19,9 @@
         .btn-logout:hover { background: #c53030; }
         .btn-admin { background: #38a169; padding: 8px 16px; font-size: 14px; margin-left: 10px; }
         .btn-admin:hover { background: #2f855a; }
-        table { width: 100%; border-collapse: collapse; overflow-x: auto; display: block; }
+        table { width: 100%; border-collapse: collapse; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #667eea; color: white; position: sticky; top: 0; }
+        th { background: #667eea; color: white; }
         .error { color: red; }
         .success { color: green; }
         .login-container { 
@@ -121,29 +121,6 @@
             padding: 5px 10px;
             font-size: 12px;
         }
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            .container { padding: 0; }
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        .status-yatim-piatu { background: #fef3c7; color: #92400e; }
-        .status-yatim { background: #dbeafe; color: #1e40af; }
-        .status-piatu { background: #e0e7ff; color: #3730a3; }
-        .status-disabilitas { background: #fce7f3; color: #9d174d; }
-        .status-lainnya { background: #e5e7eb; color: #374151; }
     </style>
 </head>
 <body>
@@ -318,21 +295,6 @@ let USERS = JSON.parse(localStorage.getItem("yayasan_users")) || {
     "pengurus": "pengurus123"
 };
 
-// Map biaya berdasarkan jenjang
-const biayaMap = { 
-    "SD": "400000",
-    "SD/MI": "400000",
-    "SMP": "500000",
-    "SMP/MTs": "500000",
-    "SMPLB": "500000",
-    "MTs": "500000",
-    "SMA": "600000", 
-    "SMK": "600000",
-    "MA": "500000",
-    "Universitas": "600000",
-    "akan masuk Universitas": "600000"
-};
-
 // Simpan user ke localStorage
 function saveUsers() {
     localStorage.setItem("yayasan_users", JSON.stringify(USERS));
@@ -381,6 +343,7 @@ function showMainPage(username) {
     document.getElementById("mainPage").style.display = "block";
     document.getElementById("loggedUser").innerText = username;
     
+    // Tampilkan tombol admin hanya untuk user 'admin'
     if (username === "admin") {
         document.getElementById("adminBtn").style.display = "inline-block";
     } else {
@@ -395,6 +358,7 @@ function showLoginPage() {
     document.getElementById("mainPage").style.display = "none";
 }
 
+// Fungsi untuk kelola user (hanya admin)
 function showUserManager() {
     document.getElementById("userModal").style.display = "flex";
     refreshUserList();
@@ -474,6 +438,9 @@ function addUser() {
     }, 2000);
 }
 
+// Format biaya
+const biayaMap = { "SD": "300000", "SMP": "400000", "SMA": "500000" };
+
 function formatRupiah(angka) {
     if (!angka && angka !== 0) return "Rp 0";
     let number = String(angka).replace(/[^0-9]/g, '');
@@ -487,7 +454,7 @@ function cleanRupiah(rupiah) {
 }
 
 document.getElementById("jenjang").onchange = function() {
-    const biayaValue = biayaMap[this.value] || "400000";
+    const biayaValue = biayaMap[this.value] || "0";
     document.getElementById("biaya").value = formatRupiah(biayaValue);
 };
 
@@ -498,17 +465,13 @@ async function simpan() {
         return;
     }
     
-    const noAnak = document.getElementById("noAnak").value.trim();
-    const ortuAsuh = document.getElementById("ortuAsuh").value.trim();
-    const pendamping = document.getElementById("pendamping").value.trim();
     const nama = document.getElementById("nama").value.trim();
-    const status = document.getElementById("status").value;
     const jenjang = document.getElementById("jenjang").value;
     const gender = document.getElementById("gender").value;
     const biayaDisplay = document.getElementById("biaya").value;
     
-    if (!nama || !jenjang || !gender || !status) {
-        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Isi semua data wajib! (Nama, Jenjang, Gender, Status)</div>";
+    if (!nama || !jenjang || !gender) {
+        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Isi semua data!</div>";
         return;
     }
     
@@ -520,25 +483,11 @@ async function simpan() {
             method: "POST",
             mode: "no-cors",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                action: "add", 
-                noAnak: noAnak,
-                ortuAsuh: ortuAsuh,
-                pendamping: pendamping,
-                namaAsuh: nama, 
-                status: status,
-                jenjang: jenjang, 
-                gender: gender, 
-                biaya: biayaAngka 
-            })
+            body: JSON.stringify({ action: "add", namaAsuh: nama, jenjang: jenjang, gender: gender, biaya: biayaAngka })
         });
         
         document.getElementById("msg").innerHTML = "<div class='success'>✅ Berhasil disimpan!</div>";
-        document.getElementById("noAnak").value = "";
-        document.getElementById("ortuAsuh").value = "";
-        document.getElementById("pendamping").value = "";
         document.getElementById("nama").value = "";
-        document.getElementById("status").value = "";
         document.getElementById("jenjang").value = "";
         document.getElementById("gender").value = "";
         document.getElementById("biaya").value = "Rp 0";
@@ -575,57 +524,38 @@ async function hapusData(index) {
     }
 }
 
-function getStatusClass(status) {
-    const statusMap = {
-        'Yatim Piatu': 'status-yatim-piatu',
-        'Yatim': 'status-yatim',
-        'Piatu': 'status-piatu',
-        'Disabilitas': 'status-disabilitas',
-        'Yatim Piatu dan Disabilitas': 'status-disabilitas'
-    };
-    return statusMap[status] || 'status-lainnya';
-}
-
 async function loadData() {
     if (sessionStorage.getItem("isLoggedIn") !== "true") return;
     
-    const filterJenjang = document.getElementById("filter").value;
-    const filterStatus = document.getElementById("filterStatus").value;
+    const filter = document.getElementById("filter").value;
     const tbody = document.querySelector("#tabel tbody");
-    tbody.innerHTML = "<tr><td colspan='9'>⏳ Loading...</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='5'>⏳ Loading...</td></tr>";
     
     try {
-        const url = `${API_URL}?action=get&filter=${filterJenjang}&filterStatus=${filterStatus}`;
+        const url = `${API_URL}?action=get&filter=${filter}`;
         const response = await fetch(url);
         const data = await response.json();
         
         if (!data || data.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='9'>📭 Belum ada data</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='5'>📭 Belum ada data</td></tr>";
             return;
         }
         
         tbody.innerHTML = "";
         for (let i = 0; i < data.length; i++) {
             const row = data[i];
-            const statusClass = getStatusClass(String(row.status || ""));
-            
             tbody.innerHTML += `
                 <tr>
-                    <td>${escapeHtml(String(row.noAnak || i+1 || ""))}</td>
-                    <td>${escapeHtml(String(row.ortuAsuh || ""))}</td>
-                    <td>${escapeHtml(String(row.pendamping || ""))}</td>
-                    <td>${escapeHtml(String(row.noAnak || ""))}</td>
-                    <td><strong>${escapeHtml(String(row.namaAsuh || row.Nama || ""))}</strong></td>
-                    <td><span class="status-badge ${statusClass}">${escapeHtml(String(row.status || ""))}</span></td>
+                    <td>${escapeHtml(String(row.namaAsuh || row.Nama || ""))}</td>
                     <td>${escapeHtml(String(row.jenjang || row.Jenjang || ""))}</td>
+                    <td>${escapeHtml(String(row.gender || row.Gender || ""))}</td>
                     <td>${formatRupiah(row.biaya || row.Biaya || "0")}</td>
                     <td><button class="btn-hapus" onclick="hapusData(${i})">🗑️ Hapus</button></td>
                 </tr>
             `;
         }
     } catch(e) {
-        console.error("Error:", e);
-        tbody.innerHTML = `<tr><td colspan='9'>❌ Error: ${e.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan='5'>❌ Error: ${e.message}</td></tr>`;
     }
 }
 
