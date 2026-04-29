@@ -1,15 +1,16 @@
-<!DOCTYPE html>
+ok bantu aku menyesuaikan kembali isi codingan ini agar sesuai dengan isi dari tabel dari data ini ya: <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Anak Asuh Yayasan</title>
+    <title>Data Yayasan - Sistem Login</title>
     <style>
+        /* style sama seperti sebelumnya */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #667eea; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
         .card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #ddd; border-radius: 8px; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #ddd; border-radius: 8px; }
         button { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }
         button:hover { background: #5a67d8; }
         .btn-hapus { background: #e53e3e; padding: 6px 12px; font-size: 12px; }
@@ -18,9 +19,9 @@
         .btn-logout:hover { background: #c53030; }
         .btn-admin { background: #38a169; padding: 8px 16px; font-size: 14px; margin-left: 10px; }
         .btn-admin:hover { background: #2f855a; }
-        table { width: 100%; border-collapse: collapse; overflow-x: auto; display: block; }
+        table { width: 100%; border-collapse: collapse; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #667eea; color: white; position: sticky; top: 0; }
+        th { background: #667eea; color: white; }
         .error { color: red; }
         .success { color: green; }
         .login-container { 
@@ -67,6 +68,9 @@
             gap: 10px;
             flex-wrap: wrap;
         }
+        .user-info span {
+            color: #666;
+        }
         .main-content {
             display: none;
         }
@@ -89,42 +93,37 @@
             width: 90%;
             max-width: 500px;
         }
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .modal-content h3 {
+            margin-bottom: 20px;
         }
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
+        .modal-content input {
+            margin-bottom: 15px;
         }
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
         }
-        .status-yatim-piatu { background: #fef3c7; color: #92400e; }
-        .status-yatim { background: #dbeafe; color: #1e40af; }
-        .status-piatu { background: #e0e7ff; color: #3730a3; }
-        .status-disabilitas { background: #fce7f3; color: #9d174d; }
-        .required::after { content: " *"; color: red; }
+        .user-list {
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .user-item button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
-<!-- Halaman Login -->
-<div id="loginPage" class="login-container">
-    <div class="login-card">
-        <h2>🔐 Login Sistem Data Yayasan</h2>
-        <div id="loginMsg"></div>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-    </div>
-</div>
-
 <!-- Halaman Utama -->
 <div id="mainPage" class="main-content">
     <div class="container">
@@ -258,9 +257,7 @@
         </div>
     </div>
 </div>
-
 <script>
-// GANTI DENGAN URL APPS SCRIPT ANDA!
 const API_URL = "https://script.google.com/macros/s/AKfycbxYECiLwB7b52sBxrI_qnv6JoP2GZ6bDMEqf6IxXo8b5EVpwqkqQnInLyKXJS2Rue0j/exec";
 
 let USERS = JSON.parse(localStorage.getItem("yayasan_users")) || {
