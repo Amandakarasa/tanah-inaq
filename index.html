@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Anak Asuh Yayasan</title>
+    <title>Data Yayasan - Sistem Login</title>
     <style>
+        /* style sama seperti sebelumnya */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #667eea; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
         .card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #ddd; border-radius: 8px; }
-        textarea { resize: vertical; font-family: Arial; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #ddd; border-radius: 8px; }
         button { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }
         button:hover { background: #5a67d8; }
         .btn-hapus { background: #e53e3e; padding: 6px 12px; font-size: 12px; }
@@ -19,9 +19,9 @@
         .btn-logout:hover { background: #c53030; }
         .btn-admin { background: #38a169; padding: 8px 16px; font-size: 14px; margin-left: 10px; }
         .btn-admin:hover { background: #2f855a; }
-        table { width: 100%; border-collapse: collapse; overflow-x: auto; display: block; }
+        table { width: 100%; border-collapse: collapse; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #667eea; color: white; position: sticky; top: 0; }
+        th { background: #667eea; color: white; }
         .error { color: red; }
         .success { color: green; }
         .login-container { 
@@ -121,33 +121,6 @@
             padding: 5px 10px;
             font-size: 12px;
         }
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            .container { padding: 0; }
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        .status-yatim-piatu { background: #fef3c7; color: #92400e; }
-        .status-yatim { background: #dbeafe; color: #1e40af; }
-        .status-piatu { background: #e0e7ff; color: #3730a3; }
-        .status-disabilitas { background: #fce7f3; color: #9d174d; }
-        .status-lainnya { background: #e5e7eb; color: #374151; }
-        .required::after {
-            content: " *";
-            color: red;
-        }
     </style>
 </head>
 <body>
@@ -178,7 +151,7 @@
             
             <div class="form-row">
                 <div>
-                    <label class="required">👤 Nama Anak Asuh</label>
+                    <label>👤 Nama Anak Asuh *</label>
                     <input type="text" id="nama" placeholder="Nama lengkap anak asuh">
                 </div>
                 <div>
@@ -200,7 +173,7 @@
 
             <div class="form-row">
                 <div>
-                    <label class="required">📚 Jenjang Pendidikan</label>
+                    <label>📚 Jenjang Pendidikan *</label>
                     <select id="jenjang">
                         <option value="">Pilih Jenjang</option>
                         <option value="SD">SD</option>
@@ -216,10 +189,15 @@
                         <option value="akan masuk Universitas">akan masuk Universitas</option>
                     </select>
                 </div>
+                <div>
+                    <label>💰 Nominal Sponsor *</label>
+                    <input type="text" id="biaya" placeholder="Biaya sponsor" readonly>
+                </div>
+            </div>
 
             <div class="form-row">
                 <div>
-                    <label class="required">📌 Status Anak</label>
+                    <label>📌 Status Anak *</label>
                     <select id="status">
                         <option value="">Pilih Status</option>
                         <option value="Yatim Piatu">Yatim Piatu</option>
@@ -233,8 +211,12 @@
                     </select>
                 </div>
                 <div>
-                    <label class="required">💰 Nominal Sponsor</label>
-                    <input type="text" id="biaya" placeholder="Biaya sponsor" readonly>
+                    <label>⚥ Jenis Kelamin *</label>
+                    <select id="gender">
+                        <option value="">Pilih Jenis Kelamin</option>
+                        <option value="Laki-laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
                 </div>
             </div>
 
@@ -272,14 +254,13 @@
                             <th>Nama Anak Asuh</th>
                             <th>Status</th>
                             <th>Jenjang</th>
-                            <th>Jenis Kelamin</th>
                             <th>Nominal Sponsor</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody><tr><td colspan="10">⏳ Loading...</td></tr>
+                    <tbody><tr><td colspan="9">⏳ Loading...</td></tr>
                 </tbody>
-            </table>
+                </table>
             </div>
         </div>
     </div>
@@ -305,29 +286,13 @@
 </div>
 
 <script>
-// GANTI URL INI DENGAN APPS SCRIPT URL ANDA YANG SUDAH DIUPDATE!
-const API_URL = "https://script.google.com/macros/s/AKfycbxYECiLwB7b52sBxrI_qnv6JoP2GZ6bDMEqf6IxXo8b5EVpwqkqQnInLyKXJS2Rue0j/exec";
+const API_URL = "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_URL/exec";
 
 // Load user dari localStorage atau default
 let USERS = JSON.parse(localStorage.getItem("yayasan_users")) || {
     "admin": "admin123",
     "yayasan": "yayasan2024",
     "pengurus": "pengurus123"
-};
-
-// Map biaya berdasarkan jenjang
-const biayaMap = { 
-    "SD": "400000",
-    "SD/MI": "400000",
-    "SMP": "500000",
-    "SMP/MTs": "500000",
-    "SMPLB": "500000",
-    "MTs": "500000",
-    "SMA": "600000", 
-    "SMK": "600000",
-    "MA": "500000",
-    "Universitas": "600000",
-    "akan masuk Universitas": "600000"
 };
 
 // Simpan user ke localStorage
@@ -378,6 +343,7 @@ function showMainPage(username) {
     document.getElementById("mainPage").style.display = "block";
     document.getElementById("loggedUser").innerText = username;
     
+    // Tampilkan tombol admin hanya untuk user 'admin'
     if (username === "admin") {
         document.getElementById("adminBtn").style.display = "inline-block";
     } else {
@@ -392,6 +358,7 @@ function showLoginPage() {
     document.getElementById("mainPage").style.display = "none";
 }
 
+// Fungsi untuk kelola user (hanya admin)
 function showUserManager() {
     document.getElementById("userModal").style.display = "flex";
     refreshUserList();
@@ -471,6 +438,9 @@ function addUser() {
     }, 2000);
 }
 
+// Format biaya
+const biayaMap = { "SD": "300000", "SMP": "400000", "SMA": "500000" };
+
 function formatRupiah(angka) {
     if (!angka && angka !== 0) return "Rp 0";
     let number = String(angka).replace(/[^0-9]/g, '');
@@ -484,7 +454,7 @@ function cleanRupiah(rupiah) {
 }
 
 document.getElementById("jenjang").onchange = function() {
-    const biayaValue = biayaMap[this.value] || "400000";
+    const biayaValue = biayaMap[this.value] || "0";
     document.getElementById("biaya").value = formatRupiah(biayaValue);
 };
 
@@ -495,78 +465,35 @@ async function simpan() {
         return;
     }
     
-    const noAnak = document.getElementById("noAnak").value.trim();
-    const ortuAsuh = document.getElementById("ortuAsuh").value.trim();
-    const pendamping = document.getElementById("pendamping").value.trim();
     const nama = document.getElementById("nama").value.trim();
-    const status = document.getElementById("status").value;
     const jenjang = document.getElementById("jenjang").value;
     const gender = document.getElementById("gender").value;
     const biayaDisplay = document.getElementById("biaya").value;
     
-    // Validasi
-    if (!nama) {
-        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Nama Anak Asuh wajib diisi!</div>";
-        return;
-    }
-    if (!jenjang) {
-        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Jenjang Pendidikan wajib dipilih!</div>";
-        return;
-    }
-    if (!gender) {
-        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Jenis Kelamin wajib dipilih!</div>";
-        return;
-    }
-    if (!status) {
-        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Status Anak wajib dipilih!</div>";
+    if (!nama || !jenjang || !gender) {
+        document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Isi semua data!</div>";
         return;
     }
     
     const biayaAngka = cleanRupiah(biayaDisplay);
-    document.getElementById("msg").innerHTML = "<div>💾 Menyimpan data ke Google Sheet...</div>";
+    document.getElementById("msg").innerHTML = "<div>💾 Menyimpan...</div>";
     
     try {
-        // HAPUS mode: "no-cors" untuk bisa membaca response!
-        const response = await fetch(API_URL, {
+        await fetch(API_URL, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ 
-                action: "add", 
-                noAnak: noAnak,
-                ortuAsuh: ortuAsuh,
-                pendamping: pendamping,
-                namaAsuh: nama, 
-                status: status,
-                jenjang: jenjang, 
-                gender: gender, 
-                biaya: biayaAngka 
-            })
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "add", namaAsuh: nama, jenjang: jenjang, gender: gender, biaya: biayaAngka })
         });
         
-        const result = await response.json();
-        console.log("Response dari server:", result);
-        
-        if (result.status === "success") {
-            document.getElementById("msg").innerHTML = "<div class='success'>✅ " + (result.message || "Data berhasil disimpan!") + "</div>";
-            // Reset form
-            document.getElementById("noAnak").value = "";
-            document.getElementById("ortuAsuh").value = "";
-            document.getElementById("pendamping").value = "";
-            document.getElementById("nama").value = "";
-            document.getElementById("status").value = "";
-            document.getElementById("jenjang").value = "";
-            document.getElementById("gender").value = "";
-            document.getElementById("biaya").value = "Rp 0";
-            // Reload tabel
-            setTimeout(loadData, 1000);
-        } else {
-            document.getElementById("msg").innerHTML = "<div class='error'>❌ Gagal: " + (result.message || "Unknown error") + "</div>";
-        }
+        document.getElementById("msg").innerHTML = "<div class='success'>✅ Berhasil disimpan!</div>";
+        document.getElementById("nama").value = "";
+        document.getElementById("jenjang").value = "";
+        document.getElementById("gender").value = "";
+        document.getElementById("biaya").value = "Rp 0";
+        setTimeout(loadData, 1000);
     } catch(e) {
-        console.error("Error detail:", e);
-        document.getElementById("msg").innerHTML = "<div class='error'>❌ Gagal menyimpan: " + e.message + ". Cek koneksi internet dan pastikan Apps Script sudah di-deploy ulang.</div>";
+        document.getElementById("msg").innerHTML = "<div class='error'>❌ Gagal: " + e.message + "</div>";
     }
 }
 
@@ -583,82 +510,52 @@ async function hapusData(index) {
     msgDiv.innerHTML = "<div>🗑️ Menghapus data...</div>";
     
     try {
-        const response = await fetch(API_URL, {
+        await fetch(API_URL, {
             method: "POST",
+            mode: "no-cors",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "delete", index: index })
         });
         
-        const result = await response.json();
-        
-        if (result.status === "success") {
-            msgDiv.innerHTML = "<div class='success'>✅ Data berhasil dihapus!</div>";
-            setTimeout(loadData, 1000);
-        } else {
-            msgDiv.innerHTML = "<div class='error'>❌ Gagal menghapus: " + (result.message || "Unknown error") + "</div>";
-        }
+        msgDiv.innerHTML = "<div class='success'>✅ Data berhasil dihapus!</div>";
+        setTimeout(loadData, 1000);
     } catch(e) {
-        console.error("Error:", e);
         msgDiv.innerHTML = "<div class='error'>❌ Gagal menghapus: " + e.message + "</div>";
     }
-}
-
-function getStatusClass(status) {
-    const statusMap = {
-        'Yatim Piatu': 'status-yatim-piatu',
-        'Yatim': 'status-yatim',
-        'Piatu': 'status-piatu',
-        'Disabilitas': 'status-disabilitas',
-        'Yatim Piatu dan Disabilitas': 'status-disabilitas'
-    };
-    return statusMap[status] || 'status-lainnya';
 }
 
 async function loadData() {
     if (sessionStorage.getItem("isLoggedIn") !== "true") return;
     
-    const filterJenjang = document.getElementById("filter").value;
-    const filterStatus = document.getElementById("filterStatus").value;
+    const filter = document.getElementById("filter").value;
     const tbody = document.querySelector("#tabel tbody");
-    tbody.innerHTML = "<tr><td colspan='10'>⏳ Loading...</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='5'>⏳ Loading...</td></tr>";
     
     try {
-        const url = `${API_URL}?action=get&filter=${filterJenjang}&filterStatus=${filterStatus}`;
-        console.log("Fetching data dari:", url);
-        
+        const url = `${API_URL}?action=get&filter=${filter}`;
         const response = await fetch(url);
         const data = await response.json();
         
-        console.log("Data diterima:", data);
-        
         if (!data || data.length === 0) {
-            tbody.innerHTML = "<table><td colspan='10'>📭 Belum ada data</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='5'>📭 Belum ada data</td></tr>";
             return;
         }
         
         tbody.innerHTML = "";
         for (let i = 0; i < data.length; i++) {
             const row = data[i];
-            const statusClass = getStatusClass(String(row.status || ""));
-            
             tbody.innerHTML += `
                 <tr>
-                    <td>${escapeHtml(String(i+1))}</td>
-                    <td>${escapeHtml(String(row.ortuAsuh || ""))}</td>
-                    <td>${escapeHtml(String(row.pendamping || ""))}</td>
-                    <td>${escapeHtml(String(row.noAnak || ""))}</td>
-                    <td><strong>${escapeHtml(String(row.namaAsuh || ""))}</strong></td>
-                    <td><span class="status-badge ${statusClass}">${escapeHtml(String(row.status || ""))}</span></td>
-                    <td>${escapeHtml(String(row.jenjang || ""))}</td>
-                    <td>${escapeHtml(String(row.gender || ""))}</td>
-                    <td>${formatRupiah(row.biaya || "0")}</td>
+                    <td>${escapeHtml(String(row.namaAsuh || row.Nama || ""))}</td>
+                    <td>${escapeHtml(String(row.jenjang || row.Jenjang || ""))}</td>
+                    <td>${escapeHtml(String(row.gender || row.Gender || ""))}</td>
+                    <td>${formatRupiah(row.biaya || row.Biaya || "0")}</td>
                     <td><button class="btn-hapus" onclick="hapusData(${i})">🗑️ Hapus</button></td>
                 </tr>
             `;
         }
     } catch(e) {
-        console.error("Error loading data:", e);
-        tbody.innerHTML = `<tr><td colspan='10'>❌ Error: ${e.message}. Cek console untuk detail.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan='5'>❌ Error: ${e.message}</td></tr>`;
     }
 }
 
