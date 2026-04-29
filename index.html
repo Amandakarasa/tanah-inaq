@@ -7,18 +7,21 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #667eea; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1400px; margin: 0 auto; }
         .card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #ddd; border-radius: 8px; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0 16px; border: 1px solid #ddd; border-radius: 8px; }
+        textarea { resize: vertical; font-family: Arial; }
         button { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; }
         button:hover { background: #5a67d8; }
         .btn-hapus { background: #e53e3e; padding: 6px 12px; font-size: 12px; }
         .btn-hapus:hover { background: #c53030; }
         .btn-logout { background: #e53e3e; padding: 8px 16px; font-size: 14px; margin-left: 10px; }
+        .btn-logout:hover { background: #c53030; }
         .btn-admin { background: #38a169; padding: 8px 16px; font-size: 14px; margin-left: 10px; }
-        table { width: 100%; border-collapse: collapse; }
+        .btn-admin:hover { background: #2f855a; }
+        table { width: 100%; border-collapse: collapse; overflow-x: auto; display: block; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #667eea; color: white; }
+        th { background: #667eea; color: white; position: sticky; top: 0; }
         .error { color: red; }
         .success { color: green; }
         .login-container { 
@@ -34,10 +37,19 @@
             border-radius: 16px;
             width: 100%;
             max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
         .login-card h2 {
             text-align: center;
             margin-bottom: 24px;
+            color: #333;
+        }
+        .login-card input {
+            margin-bottom: 20px;
+        }
+        .login-card button {
+            width: 100%;
+            margin-top: 10px;
         }
         .header {
             display: flex;
@@ -47,13 +59,67 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+        .header h2 {
+            margin: 0;
+        }
         .user-info {
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
+        }
+        .user-info span {
+            color: #666;
         }
         .main-content {
             display: none;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+        }
+        .modal-content h3 {
+            margin-bottom: 20px;
+        }
+        .modal-content input {
+            margin-bottom: 15px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .user-list {
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .user-item button {
+            padding: 5px 10px;
+            font-size: 12px;
         }
         .form-row {
             display: grid;
@@ -64,6 +130,7 @@
             .form-row {
                 grid-template-columns: 1fr;
             }
+            .container { padding: 0; }
         }
         .status-badge {
             display: inline-block;
@@ -77,11 +144,13 @@
         .status-piatu { background: #e0e7ff; color: #3730a3; }
         .status-disabilitas { background: #fce7f3; color: #9d174d; }
         .status-lainnya { background: #e5e7eb; color: #374151; }
-        .required::after { content: " *"; color: red; }
+        .required::after {
+            content: " *";
+            color: red;
+        }
     </style>
 </head>
 <body>
-
 <!-- Halaman Login -->
 <div id="loginPage" class="login-container">
     <div class="login-card">
@@ -90,7 +159,6 @@
         <input type="text" id="username" placeholder="Username">
         <input type="password" id="password" placeholder="Password">
         <button onclick="login()">Login</button>
-        <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #888;">Demo: admin / admin123</p>
     </div>
 </div>
 
@@ -102,6 +170,7 @@
                 <h2>📋 Data Anak Asuh Yayasan</h2>
                 <div class="user-info">
                     <span>👤 <span id="loggedUser"></span></span>
+                    <button class="btn-admin" onclick="showUserManager()" id="adminBtn" style="display:none;">👑 Kelola User</button>
                     <button class="btn-logout" onclick="logout()">Logout</button>
                 </div>
             </div>
@@ -137,11 +206,14 @@
                         <option value="SD">SD</option>
                         <option value="SD/MI">SD/MI</option>
                         <option value="SMP">SMP</option>
+                        <option value="SMP/MTs">SMP/MTs</option>
                         <option value="SMPLB">SMPLB</option>
                         <option value="MTs">MTs</option>
                         <option value="SMA">SMA</option>
                         <option value="SMK">SMK</option>
+                        <option value="MA">MA</option>
                         <option value="Universitas">Universitas</option>
+                        <option value="akan masuk Universitas">akan masuk Universitas</option>
                     </select>
                 </div>
                 <div>
@@ -161,6 +233,8 @@
                         <option value="Disabilitas">Disabilitas</option>
                         <option value="Anak terlantar">Anak terlantar</option>
                         <option value="Anak dari keluarga tidak mampu">Anak dari keluarga tidak mampu</option>
+                        <option value="Anak yang memiliki potensi">Anak yang memiliki potensi</option>
+                        <option value="Yatim Piatu dan Disabilitas">Yatim Piatu dan Disabilitas</option>
                     </select>
                 </div>
             </div>
@@ -171,13 +245,22 @@
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
                 <h2>📊 Data Anak Asuh</h2>
-                <select id="filter" onchange="loadData()">
-                    <option value="all">Semua Jenjang</option>
-                    <option value="SD">SD</option>
-                    <option value="SMP">SMP</option>
-                    <option value="SMA">SMA</option>
-                    <option value="Universitas">Universitas</option>
-                </select>
+                <div style="display: flex; gap: 10px;">
+                    <select id="filter" onchange="loadData()">
+                        <option value="all">Semua Jenjang</option>
+                        <option value="SD">SD</option>
+                        <option value="SMP">SMP</option>
+                        <option value="SMA">SMA</option>
+                        <option value="Universitas">Universitas</option>
+                    </select>
+                    <select id="filterStatus" onchange="loadData()">
+                        <option value="all">Semua Status</option>
+                        <option value="Yatim Piatu">Yatim Piatu</option>
+                        <option value="Yatim">Yatim</option>
+                        <option value="Piatu">Piatu</option>
+                        <option value="Disabilitas">Disabilitas</option>
+                    </select>
+                </div>
             </div>
             <div style="overflow-x: auto;">
                 <table id="tabel">
@@ -185,11 +268,11 @@
                         <tr>
                             <th>NO</th>
                             <th>Nama Orang Tua Asuh</th>
-                            <th>Nama Pendamping</th>
-                            <th>No Anak</th>
+                            <th>Nama Pendamping Lokal</th>
+                            <th>No Anak Asuh</th>
                             <th>Nama Anak Asuh</th>
                             <th>Status</th>
-                            <th>Jenjang</th>
+                            <th>Jenjang Pendidikan</th>
                             <th>Nominal Sponsor</th>
                             <th>Aksi</th>
                         </tr>
@@ -202,14 +285,31 @@
     </div>
 </div>
 
-<script>
-// ============== KONFIGURASI ==============
-const API_URL = "https://script.google.com/macros/s/AKfycbxYECiLwB7b52sBxrI_qnv6JoP2GZ6bDMEqf6IxXo8b5EVpwqkqQnInLyKXJS2Rue0j/exec";
+<!-- Modal Kelola User -->
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <h3>👑 Kelola User</h3>
+        <div id="userMsg"></div>
+        <div class="user-list" id="userList"></div>
+        <h4>Tambah User Baru</h4>
+        <input type="text" id="newUsername" placeholder="Username baru">
+        <input type="password" id="newPassword" placeholder="Password">
+        <button onclick="addUser()">➕ Tambah User</button>
+        <div class="modal-buttons">
+            <button onclick="closeUserModal()">Tutup</button>
+        </div>
+    </div>
+</div>
 
-// Data user
+<script>
+// GANTI URL INI DENGAN APPS SCRIPT URL ANDA!
+const API_URL = "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_URL/exec";
+
+// Load user dari localStorage atau default
 let USERS = JSON.parse(localStorage.getItem("yayasan_users")) || {
     "admin": "admin123",
-    "yayasan": "yayasan2024"
+    "yayasan": "yayasan2024",
+    "pengurus": "pengurus123"
 };
 
 // Map biaya berdasarkan jenjang
@@ -217,14 +317,16 @@ const biayaMap = {
     "SD": "400000",
     "SD/MI": "400000",
     "SMP": "500000",
+    "SMP/MTs": "500000",
     "SMPLB": "500000",
     "MTs": "500000",
     "SMA": "600000", 
     "SMK": "600000",
-    "Universitas": "600000"
+    "MA": "500000",
+    "Universitas": "600000",
+    "akan masuk Universitas": "600000"
 };
 
-// ============== FUNGSI LOGIN ==============
 function saveUsers() {
     localStorage.setItem("yayasan_users", JSON.stringify(USERS));
 }
@@ -233,13 +335,9 @@ window.onload = function() {
     const isLoggedIn = sessionStorage.getItem("isLoggedIn");
     const username = sessionStorage.getItem("username");
     if (isLoggedIn === "true" && username) {
-        document.getElementById("loginPage").style.display = "none";
-        document.getElementById("mainPage").style.display = "block";
-        document.getElementById("loggedUser").innerText = username;
-        loadData();
+        showMainPage(username);
     } else {
-        document.getElementById("loginPage").style.display = "flex";
-        document.getElementById("mainPage").style.display = "none";
+        showLoginPage();
     }
 };
 
@@ -256,11 +354,8 @@ function login() {
     if (USERS[username] && USERS[username] === password) {
         sessionStorage.setItem("isLoggedIn", "true");
         sessionStorage.setItem("username", username);
-        document.getElementById("loginPage").style.display = "none";
-        document.getElementById("mainPage").style.display = "block";
-        document.getElementById("loggedUser").innerText = username;
+        showMainPage(username);
         loginMsg.innerHTML = "";
-        loadData();
     } else {
         loginMsg.innerHTML = "<div class='error'>❌ Username atau password salah!</div>";
     }
@@ -268,13 +363,105 @@ function login() {
 
 function logout() {
     sessionStorage.clear();
-    document.getElementById("loginPage").style.display = "flex";
-    document.getElementById("mainPage").style.display = "none";
+    showLoginPage();
     document.getElementById("username").value = "";
     document.getElementById("password").value = "";
 }
 
-// ============== FUNGSI UTAMA ==============
+function showMainPage(username) {
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("mainPage").style.display = "block";
+    document.getElementById("loggedUser").innerText = username;
+    
+    if (username === "admin") {
+        document.getElementById("adminBtn").style.display = "inline-block";
+    } else {
+        document.getElementById("adminBtn").style.display = "none";
+    }
+    loadData();
+}
+
+function showLoginPage() {
+    document.getElementById("loginPage").style.display = "flex";
+    document.getElementById("mainPage").style.display = "none";
+}
+
+function showUserManager() {
+    document.getElementById("userModal").style.display = "flex";
+    refreshUserList();
+}
+
+function closeUserModal() {
+    document.getElementById("userModal").style.display = "none";
+    document.getElementById("userMsg").innerHTML = "";
+    document.getElementById("newUsername").value = "";
+    document.getElementById("newPassword").value = "";
+}
+
+function refreshUserList() {
+    const userListDiv = document.getElementById("userList");
+    userListDiv.innerHTML = "<h4>Daftar User:</h4>";
+    for (let [username, password] of Object.entries(USERS)) {
+        userListDiv.innerHTML += `
+            <div class="user-item">
+                <span><strong>${escapeHtml(username)}</strong> (${'*'.repeat(password.length)})</span>
+                <div>
+                    <button onclick="editUser('${username}')">✏️ Edit</button>
+                    ${username !== 'admin' ? `<button onclick="deleteUser('${username}')" style="background:#e53e3e;">🗑️ Hapus</button>` : ''}
+                </div>
+            </div>
+        `;
+    }
+}
+
+function editUser(username) {
+    const newPassword = prompt(`Edit password untuk user "${username}":`, USERS[username]);
+    if (newPassword && newPassword.trim()) {
+        USERS[username] = newPassword.trim();
+        saveUsers();
+        refreshUserList();
+        document.getElementById("userMsg").innerHTML = "<div class='success'>✅ Password berhasil diubah!</div>";
+        setTimeout(() => {
+            document.getElementById("userMsg").innerHTML = "";
+        }, 2000);
+    }
+}
+
+function deleteUser(username) {
+    if (confirm(`Hapus user "${username}"?`)) {
+        delete USERS[username];
+        saveUsers();
+        refreshUserList();
+        document.getElementById("userMsg").innerHTML = "<div class='success'>✅ User berhasil dihapus!</div>";
+        setTimeout(() => {
+            document.getElementById("userMsg").innerHTML = "";
+        }, 2000);
+    }
+}
+
+function addUser() {
+    const newUsername = document.getElementById("newUsername").value.trim();
+    const newPassword = document.getElementById("newPassword").value.trim();
+    
+    if (!newUsername || !newPassword) {
+        document.getElementById("userMsg").innerHTML = "<div class='error'>⚠️ Isi username dan password!</div>";
+        return;
+    }
+    if (USERS[newUsername]) {
+        document.getElementById("userMsg").innerHTML = "<div class='error'>⚠️ Username sudah ada!</div>";
+        return;
+    }
+    USERS[newUsername] = newPassword;
+    saveUsers();
+    refreshUserList();
+    document.getElementById("newUsername").value = "";
+    document.getElementById("newPassword").value = "";
+    document.getElementById("userMsg").innerHTML = "<div class='success'>✅ User berhasil ditambahkan!</div>";
+    setTimeout(() => {
+        document.getElementById("userMsg").innerHTML = "";
+    }, 2000);
+}
+
 function formatRupiah(angka) {
     if (!angka && angka !== 0) return "Rp 0";
     let number = String(angka).replace(/[^0-9]/g, '');
@@ -293,6 +480,12 @@ document.getElementById("jenjang").onchange = function() {
 };
 
 async function simpan() {
+    if (sessionStorage.getItem("isLoggedIn") !== "true") {
+        alert("Sesi habis, silakan login kembali!");
+        logout();
+        return;
+    }
+    
     const noAnak = document.getElementById("noAnak").value.trim();
     const ortuAsuh = document.getElementById("ortuAsuh").value.trim();
     const pendamping = document.getElementById("pendamping").value.trim();
@@ -301,7 +494,6 @@ async function simpan() {
     const jenjang = document.getElementById("jenjang").value;
     const biayaDisplay = document.getElementById("biaya").value;
     
-    // Validasi
     if (!nama) {
         document.getElementById("msg").innerHTML = "<div class='error'>⚠️ Nama Anak Asuh wajib diisi!</div>";
         return;
@@ -316,7 +508,7 @@ async function simpan() {
     }
     
     const biayaAngka = cleanRupiah(biayaDisplay);
-    document.getElementById("msg").innerHTML = "<div>💾 Menyimpan data...</div>";
+    document.getElementById("msg").innerHTML = "<div>💾 Menyimpan data ke Google Sheet...</div>";
     
     try {
         const response = await fetch(API_URL, {
@@ -339,7 +531,6 @@ async function simpan() {
         
         if (result.status === "success") {
             document.getElementById("msg").innerHTML = "<div class='success'>✅ " + (result.message || "Data berhasil disimpan!") + "</div>";
-            // Reset form
             document.getElementById("noAnak").value = "";
             document.getElementById("ortuAsuh").value = "";
             document.getElementById("pendamping").value = "";
@@ -347,7 +538,7 @@ async function simpan() {
             document.getElementById("status").value = "";
             document.getElementById("jenjang").value = "";
             document.getElementById("biaya").value = "Rp 0";
-            loadData();
+            setTimeout(loadData, 1000);
         } else {
             document.getElementById("msg").innerHTML = "<div class='error'>❌ Gagal: " + (result.message || "Unknown error") + "</div>";
         }
@@ -358,6 +549,11 @@ async function simpan() {
 }
 
 async function hapusData(index) {
+    if (sessionStorage.getItem("isLoggedIn") !== "true") {
+        alert("Sesi habis, silakan login kembali!");
+        logout();
+        return;
+    }
     if (!confirm("Apakah Anda yakin ingin menghapus data ini?")) return;
     
     const msgDiv = document.getElementById("msg");
@@ -373,7 +569,7 @@ async function hapusData(index) {
         
         if (result.status === "success") {
             msgDiv.innerHTML = "<div class='success'>✅ Data berhasil dihapus!</div>";
-            loadData();
+            setTimeout(loadData, 1000);
         } else {
             msgDiv.innerHTML = "<div class='error'>❌ Gagal menghapus: " + (result.message || "Unknown error") + "</div>";
         }
@@ -387,24 +583,24 @@ function getStatusClass(status) {
         'Yatim Piatu': 'status-yatim-piatu',
         'Yatim': 'status-yatim',
         'Piatu': 'status-piatu',
-        'Disabilitas': 'status-disabilitas'
+        'Disabilitas': 'status-disabilitas',
+        'Yatim Piatu dan Disabilitas': 'status-disabilitas'
     };
     return statusMap[status] || 'status-lainnya';
 }
 
 async function loadData() {
+    if (sessionStorage.getItem("isLoggedIn") !== "true") return;
+    
     const filterJenjang = document.getElementById("filter").value;
+    const filterStatus = document.getElementById("filterStatus").value;
     const tbody = document.querySelector("#tabel tbody");
-    tbody.innerHTML = "<tr><td colspan='9'>⏳ Loading...</td></tr>";
+    tbody.innerHTML = "<table><td colspan='9'>⏳ Loading...</td></tr>";
     
     try {
-        const url = `${API_URL}?action=get&filter=${filterJenjang}`;
-        console.log("Fetching:", url);
-        
+        const url = `${API_URL}?action=get&filter=${filterJenjang}&filterStatus=${filterStatus}`;
         const response = await fetch(url);
         const data = await response.json();
-        
-        console.log("Data:", data);
         
         if (!data || data.length === 0) {
             tbody.innerHTML = "<tr><td colspan='9'>📭 Belum ada data</td></tr>";
